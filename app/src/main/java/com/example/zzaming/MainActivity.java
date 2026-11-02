@@ -20,6 +20,6 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        // 사소한 수정
+        // 사소한 수정 수정 제대로 되나요?
     }
 }
