@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_edit_profile.xml — 내 정보 수정 (EditProfileActivity)
+    설정 화면의 "내 정보 수정"(row_edit_profile)을 누르면 열려요.
+    뒤로 가면 설정 화면으로 돌아가야 하니, 설정에서 이동할 때 finish() 하지 마세요.
+
+    ┌ [<  내 정보 수정]
+    │ ┌ 흰 카드 ────────────────────┐
+    │ │ 아이디  test   (바꿀 수 없음) │
+    │ │ 이름    [김민준          ]    │
+    │ │ 계급    [일병          ▾]    │   ← 간부면 layout_rank 를 GONE
+    │ │ 입대일 [2026-01-01] 전역일 [2027-07-01] │
+    │ │ (오류 상자)                    │
+    │ │ [          저장          ]    │
+    │ └─────────────────────────────┘
+
+    ══════════ 입력칸과 User 클래스 ══════════
+      tv_username       → user.getEmail()        (보여주기만, 수정 안 함)
+      et_name           → setName
+      sp_rank           → setRank  (위치 0 이병 / 1 일병 / 2 상병 / 3 병장 → "private" / "pfc" / "corporal" / "sergeant")
+      tv_enlist_date    → setEnlistmentDate  "2026-01-01" 형식
+      tv_discharge_date → setDischargeDate
+
+    ══════════ 구현 순서 ══════════
+    1) 화면이 열리면 지금 값 채우기 (onCreate)
+         User user = UserManager.getCurrentUser();
+         binding.tvUsername.setText(user.getEmail());
+         binding.etName.setText(user.getName());
+         계급 코드 → Spinner 위치로: "private" 0, "pfc" 1, "corporal" 2, "sergeant" 3
+           binding.spRank.setSelection(위치);
+         간부(memberType 이 "officer")면 binding.layoutRank.setVisibility(View.GONE);
+         날짜 칸: binding.tvEnlistDate.setText(user.getEnlistmentDate());
+
+    2) 날짜 칸을 누르면 DatePickerDialog (회원가입과 같은 방식)
+         지금 칸에 적힌 날짜로 달력을 열기: LocalDate d = LocalDate.parse(칸의 글자);
+         new DatePickerDialog(this, (picker, y, m, day) -> { ... }, d.getYear(), d.getMonthValue() - 1, d.getDayOfMonth()).show();
+           ← DatePicker 의 월은 0부터, LocalDate 의 월은 1부터라 -1 / +1 주의
+       ⚠ 회원가입과 달리 입대일을 바꿔도 전역일을 자동으로 다시 계산하지 마세요.
+         (이미 정해진 전역일을 사용자가 모르게 바꾸면 안 되니까)
+
+    3) btn_save 클릭 → 검사 (걸리면 오류 상자에 표시하고 return)
+         이름 : name.isEmpty()                           이면 edit_error_name
+         날짜 : 전역일이 입대일보다 앞 (discharge.isBefore(enlist)) 이면 edit_error_dates
+       통과하면 user 의 setter 로 값 바꾸기 → Toast(edit_saved) → finish()
+       (지금은 currentUser 객체를 직접 바꾸니까 따로 "저장"할 곳이 없어요. 서버가 붙으면 여기서 Firestore 에 저장)
+
+    4) 돌아간 화면(설정·홈)은 onCreate 가 다시 안 불려서 예전 값이 남아요.
+       → 설정/홈의 값 채우는 코드를 메서드로 빼고 onRestart() 에서도 부르기
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:orientation="vertical">
+
+    <!-- ═══════ 상단바: [< 내 정보 수정] (설정 화면과 같은 모양) ═══════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/top_bar_height"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="14dp"
+        android:paddingEnd="20dp">
+
+        <LinearLayout
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:contentDescription="@string/set_back"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="6dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_chevron_left"
+                app:tint="@color/text_primary" />
+
+            <TextView
+                style="@style/JjamText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:letterSpacing="-0.03"
+                android:text="@string/edit_title"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/header_divider" />
+
+    <!-- 키보드가 올라와도 저장 버튼까지 스크롤되게 ScrollView 로 감쌈 -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="@dimen/screen_padding_h"
+            android:paddingTop="@dimen/screen_padding_top"
+            android:paddingEnd="@dimen/screen_padding_h"
+            android:paddingBottom="32dp">
+
+            <TextView
+                style="@style/JjamText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_marginBottom="10dp"
+                android:text="@string/edit_desc"
+                android:textColor="@color/text_muted"
+                android:textSize="@dimen/text_caption" />
+
+            <!-- ═══════ 흰 카드 (입력칸 묶음) ═══════ -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card"
+                android:orientation="vertical"
+                android:paddingStart="18dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="20dp">
+
+                <!-- 아이디: 바꿀 수 없어서 EditText 가 아니라 TextView. 흐리게(alpha) 보여줌 -->
+                <TextView
+                    style="@style/AuthLabel"
+                    android:text="@string/edit_label_username" />
+
+                <TextView
+                    android:id="@+id/tv_username"
+                    style="@style/JjamInput"
+                    android:alpha="0.6"
+                    tools:text="@string/edit_username_sample" />
+
+                <TextView
+                    style="@style/JjamText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="@string/edit_username_help"
+                    android:textColor="@color/auth_help"
+                    android:textSize="@dimen/text_tiny" />
+
+                <!-- 이름 -->
+                <TextView
+                    style="@style/AuthLabel"
+                    android:text="@string/auth_label_name" />
+
+                <EditText
+                    android:id="@+id/et_name"
+                    style="@style/JjamInput"
+                    android:autofillHints="name"
+                    android:hint="@string/auth_hint_name"
+                    android:inputType="textPersonName"
+                    android:maxLength="40" />
+
+                <!-- 계급: 이름표와 선택 상자를 한 상자로 묶어서, 간부일 때 한 번에 숨김 (회원가입과 같음) -->
+                <LinearLayout
+                    android:id="@+id/layout_rank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/AuthLabel"
+                        android:text="@string/auth_label_rank" />
+
+                    <Spinner
+                        android:id="@+id/sp_rank"
+                        style="@style/JjamSpinner"
+                        android:entries="@array/auth_ranks" />
+                </LinearLayout>
+
+                <!-- 입대일 | 전역일 (반반). 누르면 DatePickerDialog -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="4.5dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/AuthLabel"
+                            android:text="@string/auth_label_enlist_date" />
+
+                        <TextView
+                            android:id="@+id/tv_enlist_date"
+                            style="@style/AuthDateField"
+                            tools:text="@string/auth_date_sample" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4.5dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/AuthLabel"
+                            android:text="@string/auth_label_discharge_date" />
+
+                        <TextView
+                            android:id="@+id/tv_discharge_date"
+                            style="@style/AuthDateField"
+                            tools:text="@string/auth_date_sample" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- 오류 메시지 상자: 처음엔 gone. 검사에 걸리면
+                       binding.tvEditError.setText(R.string.edit_error_name);
+                       binding.tvEditError.setVisibility(View.VISIBLE); -->
+                <TextView
+                    android:id="@+id/tv_edit_error"
+                    style="@style/JjamText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="13dp"
+                    android:background="@drawable/bg_auth_error"
+                    android:padding="10dp"
+                    android:text="@string/edit_error_name"
+                    android:textColor="@color/auth_error_text"
+                    android:textSize="@dimen/text_tiny"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_save"
+                    style="@style/JjamButton"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="18dp"
+                    android:text="@string/edit_save" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

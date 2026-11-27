@@ -1,5 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    앱 전체가 같이 쓰는 색 (브랜드, 배경, 글자, 입력 폼, 하단 탭, 경험치 조각 등)
+
+    리소스는 "파일 이름"이 아니라 항목의 name 으로 찾기 때문에,
+    어느 파일에 있든 @color/이름, R.color.이름 으로 똑같이 쓸 수 있어요.
+    여러 화면이 쓰는 항목은 공용 파일(colors.xml), 한 화면만 쓰는 항목은 화면별 파일에 둡니다.
+-->
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- 브랜드 / 주 색상 (짙은 국방색 계열) -->
+    <color name="primary">#FF345D46</color>
+    <color name="primary_dark">#FF244C39</color>
+    <color name="primary_light">#FF3D674F</color>
+    <color name="brand_mark">#FF325B45</color>
+    <color name="brand_mark_inner">#FFDCE8C9</color>
+
+    <!-- 배경 / 표면 -->
+    <color name="background">#FFF5F6F1</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_soft2">#FFF6F7F3</color>
+    <color name="card_stroke">#FFE7EBE4</color>
+    <color name="divider">#FFEDF0EB</color>
+    <color name="header_divider">#12233F2F</color>
+
+    <!-- 글자색 -->
+    <color name="text_primary">#FF1B2A22</color>
+    <color name="text_muted">#FF89938C</color>
+    <color name="text_hint">#FF7A877F</color>
+    <color name="text_kicker">#FF77907E</color>
+    <color name="icon_default">#FF4B5D52</color>
+
+    <!-- 카드 라벨 아이콘 (작은 둥근 사각형 배경) -->
+    <color name="label_icon_bg">#FFE8EEE2</color>
+    <color name="label_icon_tint">#FF41694F</color>
+
+    <!-- 짙은 카드(전역일 카드) 위의 글자 -->
+    <color name="on_dark">#FFFFFFFF</color>
+    <color name="on_dark_secondary">#FFC0D2C3</color>
+    <color name="avatar_ring">#80FFFFFF</color>
+
+    <!-- 퀘스트 / 경험치 -->
+    <color name="xp_bg">#FFEEF3E9</color>
+    <color name="level_badge">#FF42664E</color>
+    <color name="xp_track">#FFD7E0D3</color>
+    <color name="xp_start">#FF6E9271</color>
+    <color name="xp_end">#FF9EB47D</color>
+    <color name="xp_name">#FF3B5142</color>
+    <color name="quest_check">#FF9AAC9F</color>
+
+    <!-- 하단 내비게이션 -->
+    <color name="nav_bg">#FFFCFDF9</color>
+    <color name="nav_stroke">#FFE1E6DF</color>
+    <color name="nav_active">#FF2F5942</color>
+    <color name="nav_inactive">#FF9AA49E</color>
+
+    <!-- 바텀시트 / 입력 폼 -->
+    <color name="sheet_bg">#FFF9FAF6</color>
+    <color name="form_label">#FF526158</color>
+    <color name="input_text">#FF293E31</color>
+    <color name="input_stroke">#FFDCE3DA</color>
+    <color name="input_focus">#FF6C8A73</color>
+    <color name="chip_text">#FF718078</color>
+    <color name="chip_checked_text">#FF315740</color>
+    <color name="select_bg">#FFEDF1E9</color>
+
+    <!-- 전파사항 / 마음의 편지 창 -->
+    <color name="option_checked_stroke">#FF6F8C75</color>
+    <color name="option_checked_bg">#FFE4ECE0</color>
 </resources>

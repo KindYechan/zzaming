@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    회원가입의 계급 목록 (로그인 / 회원가입 화면 전용).
+    행정반 가입 시트의 ranks 배열(0번이 "계급을 선택해주세요")과 달리
+    안내 문구가 없고 0번 "이병"이 기본값이에요.
+-->
+<resources>
+    <string-array name="auth_ranks">
+        <item>이병</item>
+        <item>일병</item>
+        <item>상병</item>
+        <item>병장</item>
+    </string-array>
+</resources>

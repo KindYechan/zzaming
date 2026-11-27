@@ -22,5 +22,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "zzaming"
+rootProject.name = "jjam_merged"
 include(":app")
+ 

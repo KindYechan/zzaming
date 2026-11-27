@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 내 정보 수정 화면 전용 글자 (이름 앞에 edit_)
+     이름표·힌트(이름, 계급, 입대일, 전역일)는 회원가입의 auth_ 글자를 같이 써요. -->
+<resources>
+    <string name="edit_title">내 정보 수정</string>
+    <string name="edit_desc">바꾼 내용은 저장을 눌러야 반영돼요.</string>
+    <string name="edit_label_username">아이디</string>
+    <string name="edit_username_help">아이디는 바꿀 수 없어요.</string>
+    <string name="edit_username_sample">test</string>
+    <string name="edit_save">저장</string>
+    <string name="edit_saved">내 정보를 저장했어요</string>
+
+    <!-- 오류 문구 -->
+    <string name="edit_error_name">이름을 입력해주세요.</string>
+    <string name="edit_error_dates">전역일은 입대일보다 뒤여야 해요.</string>
+</resources>

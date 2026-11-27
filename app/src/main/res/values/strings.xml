@@ -1,3 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    앱 전체가 같이 쓰는 글자 (앱 이름, 공통 버튼, 하단 탭, 여러 화면이 쓰는 조각)
+
+    리소스는 "파일 이름"이 아니라 항목의 name 으로 찾기 때문에,
+    어느 파일에 있든 @string/이름, R.string.이름 으로 똑같이 쓸 수 있어요.
+    여러 화면이 쓰는 항목은 공용 파일(strings.xml), 한 화면만 쓰는 항목은 화면별 파일에 둡니다.
+-->
 <resources>
-    <string name="app_name">zzaming</string>
+    <string name="app_name">짬인지</string>
+
+    <!-- 공통 -->
+    <string name="action_notifications">지난 알림</string>
+    <string name="action_settings">설정</string>
+
+    <!-- 하단 내비게이션 -->
+    <string name="nav_home">홈</string>
+    <string name="nav_admin">행정반</string>
+
+    <!-- 여러 화면이 같이 쓰는 조각 (프로필 사진, 경험치 미리보기 layout_xp_preview, 퀘스트 D-day) -->
+    <string name="home_profile_desc">프로필 사진</string>
+    <string name="xp_level_label">LV</string>
+    <string name="xp_level_sample">7</string>
+    <string name="xp_name_sample">김민준 일병</string>
+    <string name="xp_value_sample">1,240 / 2,000 XP</string>
+    <string name="quest1_dday">D-0</string>
+
+    <!-- 바텀시트 / 창 공통 -->
+    <string name="action_close">닫기</string>
 </resources>

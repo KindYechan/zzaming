@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/layout_section_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/tv_section_title"
+            style="@style/Text.App.CaptionBold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/vacation_text"
+            android:textSize="12sp"
+            tools:text="선택한 날짜" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginStart="8dp"
+            android:background="@color/cm_divider" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/vacation_item"
+        style="@style/Widget.App.ListRow"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <View
+            android:layout_width="6dp"
+            android:layout_height="match_parent"
+            android:background="@color/vacation" />
+
+        <LinearLayout
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+
+            <TextView
+                android:id="@+id/tv_vacation_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/vacation_text"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                tools:text="06.15" />
+
+            <TextView
+                android:id="@+id/tv_vacation_end_sub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/vacation_text"
+                android:textSize="11sp"
+                tools:text="~ 06.18" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tv_vacation_title"
+                    style="@style/Text.App.Body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/vacation_text"
+                    android:textSize="14sp"
+                    tools:text="정기휴가 (2차)" />
+
+                <TextView
+                    android:id="@+id/tv_vacation_duration_badge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/cm_bg_chip"
+                    android:paddingStart="8dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="8dp"
+                    android:paddingBottom="2dp"
+                    android:textColor="@color/vacation_text"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    tools:text="3박 4일" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_vacation_flow_sub"
+                style="@style/Text.App.Caption"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/vacation_text"
+                android:textSize="11sp"
+                tools:text="06.15(월) 출발 · 06.18(목) 복귀" />
+        </LinearLayout>
+
+        <!-- 우측 끝: 이동 화살표 인디케이터 (›) -->
+        <TextView
+            android:id="@+id/tv_arrow_more"
+            android:layout_width="24dp"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="›"
+            android:textColor="@color/vacation_text"
+            android:textSize="20sp" />
+    </LinearLayout>
+</LinearLayout>
