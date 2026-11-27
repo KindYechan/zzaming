@@ -542,12 +542,13 @@ public class QuestActivity extends AppCompatActivity {
 
     // 상단 xp 및 레벨 카드 업데이트 showBundlesForRank 맨 마지막에, checkedClickListener 마지막부분에 쓰임
     private void updateXpCard() {
-        long totalXp = 320L + questViewModel.getCompletedQuestXp();
-        long level = 4 + (totalXp / 500L);
-        long currentXp = totalXp % 500L;
-        binding.questXpSettings.setText(getString(R.string.quest_xp_current_xp_format, currentXp, 500));
+        // [추가] 계산식은 QuestXp 로 옮겼어요 (홈·행정반 화면과 같은 값을 보여 주려고)
+        long totalXp = QuestXp.getTotalXp(questViewModel.getCompletedQuestXp());
+        long level = QuestXp.getLevel(totalXp);
+        long currentXp = QuestXp.getXpInLevel(totalXp);
+        binding.questXpSettings.setText(getString(R.string.quest_xp_current_xp_format, currentXp, (int) QuestXp.XP_PER_LEVEL));
         binding.questLevel.setText(getString(R.string.quest_xp_current_level_format, level));
-        binding.questXpProgress.setMax(500);
+        binding.questXpProgress.setMax((int) QuestXp.XP_PER_LEVEL);
         binding.questXpProgress.setProgressCompat((int)currentXp, true);
     }
 }

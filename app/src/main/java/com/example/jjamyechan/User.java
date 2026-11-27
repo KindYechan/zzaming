@@ -210,6 +210,34 @@ public class User {
         }
     }
 
+    // ───────── 계급 이름 (화면 표시용) ─────────
+
+    // 계급 코드 → 한글. 예) "pfc" → "일병"
+    // static 이라서 User 객체 없이 User.rankToKorean("pfc") 처럼 쓸 수 있어요
+    public static String rankToKorean(String rank) {
+        if (rank == null) return "간부";
+        switch (rank) {
+            case "private":             return "이병";
+            case "pfc":
+            case "private-first-class": return "일병";   // 내 정보 수정 화면은 이 코드를 써요
+            case "corporal":            return "상병";
+            case "sergeant":            return "병장";
+            default:                    return rank;
+        }
+    }
+
+    // 다음 계급 코드. 병장이거나 간부면 null
+    public static String nextRank(String rank) {
+        if (rank == null) return null;
+        switch (rank) {
+            case "private":             return "pfc";
+            case "pfc":
+            case "private-first-class": return "corporal";
+            case "corporal":            return "sergeant";
+            default:                    return null;
+        }
+    }
+
     // ───────── Object 메서드 ─────────
 
     @Override

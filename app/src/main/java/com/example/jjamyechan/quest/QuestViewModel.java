@@ -48,6 +48,16 @@ public class QuestViewModel extends ViewModel{
         });
     }
 
+    // [추가] 홈·행정반 화면에서 쓰려고 목록 세 개를 한 묶음으로 돌려줘요.
+    // 복사본이 아니라 같은 목록이라서, 여기서 완료 표시를 바꾸고 save() 를 부르면 그대로 저장돼요.
+    public QuestRepository.QuestData getData() {
+        QuestRepository.QuestData data = new QuestRepository.QuestData();
+        data.bundles = questBundles;
+        data.quests = quests;
+        data.progresses = questProgresses;
+        return data;
+    }
+
     // 지금 목록을 저장소에 저장 (QuestActivity 의 onPause 에서 불러요)
     public void save() {
         QuestRepository.QuestData data = new QuestRepository.QuestData();

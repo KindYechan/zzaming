@@ -52,4 +52,13 @@
     <string name="quest2_due">6월 18일까지</string>
     <string name="quest2_dday">D-2</string>
     <string name="quest2_xp">+120 XP</string>
+
+
+    <!-- [추가] 실제 데이터로 채울 때 쓰는 글자 -->
+    <string name="home_schedule_empty_title">오늘은 일정이 없어요</string>
+    <string name="home_schedule_empty_desc">캘린더에서 일정을 추가해 보세요</string>
+    <string name="home_schedule_all_day">종일</string>
+    <string name="home_quest_empty">지금 할 퀘스트를 모두 끝냈어요</string>
+    <!-- getString(R.string.home_quest_done, 80) → "+80 XP 획득!" -->
+    <string name="home_quest_done">+%1$d XP 획득!</string>
 </resources>

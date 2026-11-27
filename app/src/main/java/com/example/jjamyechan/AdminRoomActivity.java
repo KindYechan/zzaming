@@ -5,23 +5,39 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.jjamyechan.community.CommunityRepository;
+import com.example.jjamyechan.community.model.Post;
 import com.example.jjamyechan.data.DataCallback;
 import com.example.jjamyechan.data.DataProvider;
+import com.example.jjamyechan.data.QuestRepository;
+import com.example.jjamyechan.quest.Quest;
+import com.example.jjamyechan.quest.QuestViewModel;
+import com.example.jjamyechan.quest.QuestXp;
 import com.example.jjamyechan.databinding.ActivityAdminRoomBinding;
 import com.example.jjamyechan.databinding.DialogBroadcastBinding;
 import com.example.jjamyechan.databinding.DialogLetterBinding;
 import com.example.jjamyechan.databinding.PopupRoomMenuBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Locale;
 
 public class AdminRoomActivity extends AppCompatActivity {
     private ActivityAdminRoomBinding binding;
@@ -38,35 +54,8 @@ public class AdminRoomActivity extends AppCompatActivity {
             return insets;
         });
 
-        // intent로 전달된 데이터 저장부
-        String unitName = getIntent().getStringExtra("unit_name");
-        boolean[] feature = getIntent().getBooleanArrayExtra("feature");
-
-        // [병합 시 추가] 가입한 행정반이 있으면 저장소(나중에는 서버)에서 이름과 기능 설정을 읽어 와요
-        AdminRoon unit = loadMyUnit();
-        if (unit != null) {
-            unitName = (unit.getNickname() != null && !unit.getNickname().isEmpty()) ? unit.getNickname() : unit.getUnitName();
-            feature = unit.getFeatures();
-        }
-        if (feature == null) {
-            feature = new boolean[]{true, true, true, true, true, true};
-        }
-        binding.tvRoomTitle.setText(getString(R.string.unit_name, unitName));
-        binding.btnUnreadNotice.setVisibility(feature[3] ? View.VISIBLE : View.GONE);
-        binding.btnUrgentQuest.setVisibility(feature[1] ? View.VISIBLE : View.GONE);
-
-        // 캘린더 카드 보이게할지
-        binding.cardRoomCalendar.setVisibility(feature[0] ? View.VISIBLE : View.GONE);
-        // 퀘스트 카드 보이게할지
-        binding.cardRoomQuest.setVisibility(feature[1] ? View.VISIBLE : View.GONE);
-        // 진급 카드 보이게할지
-        binding.cardPromotion.setVisibility(feature[2] ? View.VISIBLE : View.GONE);
-        // 게시판 카드 보이게할지
-        binding.cardBoard.setVisibility(feature[3] ? View.VISIBLE : View.GONE);
-        // 전파사항 카드 보이게할지
-        binding.cardBroadcast.setVisibility(feature[4] ? View.VISIBLE : View.GONE);
-        // 마음의 편지 카드 보이게할지
-        binding.cardLetter.setVisibility(feature[5] ? View.VISIBLE : View.GONE);
+        // 행정반 이름과 기능 켜고 끄기 (저장소에서 읽어 온 뒤에 그려요)
+        showUnitInfo();
 
         // 행정반 전파사항
         binding.cardBroadcast.setOnClickListener(view -> {
@@ -176,24 +165,199 @@ public class AdminRoomActivity extends AppCompatActivity {
         });
     }
 
-    // [병합 시 추가] 내가 가입한 행정반 정보 읽기 (가입 안 했거나 못 찾으면 null)
-    private AdminRoon loadMyUnit() {
+    // 화면이 보일 때마다 (처음 + 다른 화면에서 돌아올 때) 최신 값으로 다시 그려요
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showSummaryDate();
+        showMiniWeek();
+        showRoomQuests();
+        showBoardInfo();
+        showPromotionInfo();
+    }
+
+    // ───────────── 행정반 이름 + 기능 켜고 끄기 ─────────────
+
+    // 가입한 행정반을 저장소(나중에는 서버)에서 읽어 와서 그려요.
+    // 결과는 onSuccess 로 오니까, 화면 그리기(applyUnit)도 그 안에서 불러요.
+    private void showUnitInfo() {
         User user = UserManager.getCurrentUser();
-        if (user == null || user.getUnitCode() == null) return null;
-        final AdminRoon[] found = {null};   // 람다 안에서 값을 넣으려고 배열로 (effectively final 규칙)
+
+        // 가입 정보가 없으면 (예전 방식) Intent 로 받은 값으로 그리기
+        if (user.getUnitCode() == null) {
+            applyUnit(getIntent().getStringExtra("unit_name"), getIntent().getBooleanArrayExtra("feature"), 0);
+            return;
+        }
+
         DataProvider.units().getUnit(user.getUnitCode(), new DataCallback<AdminRoon>() {
             @Override
-            public void onSuccess(AdminRoon result) {
-                found[0] = result;
+            public void onSuccess(AdminRoon unit) {
+                // 닉네임이 있으면 닉네임, 없으면 부대 이름
+                String name = unit.getNickname();
+                if (name == null || name.isEmpty()) {
+                    name = unit.getUnitName();
+                }
+                applyUnit(name, unit.getFeatures(), unit.getMemberCount());
             }
 
             @Override
             public void onFailure(Exception e) {
+                applyUnit(getIntent().getStringExtra("unit_name"), getIntent().getBooleanArrayExtra("feature"), 0);
             }
         });
-        // 주의: 지금 로컬 저장소는 결과를 바로 줘서 이렇게 써도 돼요.
-        // 서버를 붙이면 결과가 늦게 오니까, onSuccess 안에서 화면을 그리도록 옮겨야 해요.
-        return found[0];
+    }
+
+    // 제목, 인원 수, 카드 보이기/숨기기
+    // feature 순서: (캘린더, 퀘스트, 진급계산, 게시판, 전파사항, 마편)
+    private void applyUnit(String unitName, boolean[] feature, int memberCount) {
+        if (feature == null) {
+            feature = new boolean[]{true, true, true, true, true, true};
+        }
+        binding.tvRoomTitle.setText(getString(R.string.unit_name, unitName));
+        binding.tvParticipants.setText(getString(R.string.room_participants_format, memberCount));
+        binding.btnUnreadNotice.setVisibility(feature[3] ? View.VISIBLE : View.GONE);
+        binding.btnUrgentQuest.setVisibility(feature[1] ? View.VISIBLE : View.GONE);
+
+        // 캘린더 카드 보이게할지
+        binding.cardRoomCalendar.setVisibility(feature[0] ? View.VISIBLE : View.GONE);
+        // 퀘스트 카드 보이게할지
+        binding.cardRoomQuest.setVisibility(feature[1] ? View.VISIBLE : View.GONE);
+        // 진급 카드 보이게할지
+        binding.cardPromotion.setVisibility(feature[2] ? View.VISIBLE : View.GONE);
+        // 게시판 카드 보이게할지
+        binding.cardBoard.setVisibility(feature[3] ? View.VISIBLE : View.GONE);
+        // 전파사항 카드 보이게할지
+        binding.cardBroadcast.setVisibility(feature[4] ? View.VISIBLE : View.GONE);
+        // 마음의 편지 카드 보이게할지
+        binding.cardLetter.setVisibility(feature[5] ? View.VISIBLE : View.GONE);
+    }
+
+    // ───────────── 요약 카드: 오늘 날짜와 시간 ─────────────
+
+    private void showSummaryDate() {
+        // "M월 d일 EEEE" → "11월 27일 금요일" (EEEE = 요일 전체 이름)
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("M월 d일 EEEE", Locale.KOREAN);
+        DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm");
+        binding.tvSummaryDate.setText(LocalDate.now().format(dateFormat));
+        binding.tvSummaryTime.setText(LocalTime.now().format(timeFormat));
+    }
+
+    // ───────────── 캘린더 카드: 이번 주 월~금 ─────────────
+
+    private void showMiniWeek() {
+        LinearLayout[] cells = {binding.miniMon, binding.miniTue, binding.miniWed, binding.miniThu, binding.miniFri};
+        TextView[] labels = {binding.tvMiniMonLabel, binding.tvMiniTueLabel, binding.tvMiniWedLabel, binding.tvMiniThuLabel, binding.tvMiniFriLabel};
+        TextView[] dates = {binding.tvMiniMonDate, binding.tvMiniTueDate, binding.tvMiniWedDate, binding.tvMiniThuDate, binding.tvMiniFriDate};
+
+        LocalDate today = LocalDate.now();
+        LocalDate monday = today.minusDays(today.getDayOfWeek().getValue() - 1);   // 월=1 … 일=7
+
+        for (int i = 0; i < 5; i++) {
+            LocalDate day = monday.plusDays(i);
+            dates[i].setText(String.valueOf(day.getDayOfMonth()));
+
+            if (day.equals(today)) {
+                cells[i].setBackgroundResource(R.drawable.bg_mini_week_active);
+                labels[i].setTextColor(ContextCompat.getColor(this, R.color.mini_week_sub));
+                dates[i].setTextColor(ContextCompat.getColor(this, R.color.on_dark));
+            } else {
+                cells[i].setBackground(null);
+                labels[i].setTextColor(ContextCompat.getColor(this, R.color.text_muted));
+                dates[i].setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+            }
+        }
+        // 주말에는 오늘 칸이 없어서 아무 칸도 진하게 칠해지지 않아요
+    }
+
+    // ───────────── 퀘스트: 요약 카드의 "긴박한 퀘스트" + 퀘스트 카드 ─────────────
+
+    private void showRoomQuests() {
+        // 홈 화면과 같은 방법: 퀘스트 화면의 QuestViewModel 을 그대로 써요
+        QuestViewModel questModel = new QuestViewModel();
+        QuestRepository.QuestData data = questModel.getData();
+
+        // 아직 완료하지 않은 첫 번째 퀘스트 찾기
+        Quest next = null;
+        for (Quest quest : data.quests) {
+            if (!QuestXp.isCompleted(data, quest)) {
+                next = quest;
+                break;
+            }
+        }
+
+        // 퀘스트에는 마감일이 아직 없어서 D-day 배지는 숨겨요
+        binding.tvUrgentDday.setVisibility(View.GONE);
+
+        if (next == null) {
+            binding.tvUrgentQuest.setText(R.string.room_quest_empty);
+            binding.tvRoomQuestName.setText(R.string.room_quest_empty);
+            binding.tvRoomQuestDesc.setText("");
+            binding.tvRoomQuestReward.setText("");
+            return;
+        }
+
+        binding.tvUrgentQuest.setText(next.getTitle());
+        binding.tvRoomQuestName.setText(next.getTitle());
+        binding.tvRoomQuestDesc.setText(next.getDescription());
+        binding.tvRoomQuestReward.setText(getString(R.string.quest_xp_reward_format, next.getRewardXp()));
+    }
+
+    // ───────────── 게시판: 공지 수 + 글 수 ─────────────
+
+    private void showBoardInfo() {
+        DataProvider.community().fetchServerPosts(new CommunityRepository.OnPostLoadListener() {
+            @Override
+            public void onSuccess(List<Post> postList) {
+                // 공지 글만 세기
+                int noticeCount = 0;
+                for (Post post : postList) {
+                    if ("공지".equals(post.getCategory())) {
+                        noticeCount++;
+                    }
+                }
+                // 누가 무엇을 읽었는지는 아직 저장하지 않아서, "미확인"이 아니라 공지 전체 수예요
+                binding.tvUnreadCount.setText(getString(R.string.room_unread_count_format, noticeCount));
+                binding.tvBoardSub.setText(getString(R.string.room_board_sub_format, postList.size()));
+            }
+
+            @Override
+            public void onFailure(Exception e) {
+                binding.tvUnreadCount.setText(getString(R.string.room_unread_count_format, 0));
+                binding.tvBoardSub.setText(getString(R.string.room_board_sub_format, 0));
+            }
+        });
+    }
+
+    // ───────────── 진급계산기 카드: 다음 진급까지 D-day ─────────────
+
+    private void showPromotionInfo() {
+        User user = UserManager.getCurrentUser();
+
+        // 간부는 계급 진급이 없어서 안내 문구만
+        if ("officer".equals(user.getMemberType())) {
+            binding.tvPromotionSub.setText(R.string.room_promotion_sub_officer);
+            return;
+        }
+
+        LocalDate today = LocalDate.now();
+        String next = User.nextRank(user.getRank());
+        // 진급일이 이미 저장된 계급은 건너뛰기 (예: 계급은 이병인데 일병 진급일이 저장돼 있으면 → 상병)
+        while (next != null && user.isPromotedTo(next)) {
+            next = User.nextRank(next);
+        }
+
+        // 병장이면 다음 진급이 없으니 전역까지
+        if (next == null) {
+            long daysLeft = ChronoUnit.DAYS.between(today, LocalDate.parse(user.getDischargeDate()));
+            binding.tvPromotionSub.setText(getString(R.string.room_promotion_sub_discharge, daysLeft));
+            return;
+        }
+
+        long days = ChronoUnit.DAYS.between(today, user.getPromotionDate(next));
+        if (days < 0) {
+            days = 0;   // 예정일이 지났는데 진급일이 저장 안 된 경우 (진급 누락) → D-0 으로
+        }
+        binding.tvPromotionSub.setText(getString(R.string.room_promotion_sub_format, User.rankToKorean(next), days));
     }
 
     // 마음의 편지 창 띄우기 (카드, 메뉴 팝업 두 곳에서 사용)
