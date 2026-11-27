@@ -7,6 +7,8 @@ public class AdminRoon {
     boolean useCalendar, useQuest, usePromotion, useNotice, useBroadcast, useLetter;
     // 소속 부대원
     int memberCount;
+    // [추가] 활동 로그 기록 여부 (생성 2단계의 스위치)
+    boolean activityLog;
 
     public AdminRoon() {
     }
@@ -99,5 +101,13 @@ public class AdminRoon {
 
     public void setMemberCount(int memberCount) {
         this.memberCount = memberCount;
+    }
+
+    public boolean isActivityLog() {
+        return activityLog;
+    }
+
+    public void setActivityLog(boolean activityLog) {
+        this.activityLog = activityLog;
     }
 }

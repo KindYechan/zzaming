@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    layout_no_unit.xml — 행정반에 아직 들어가지 않았을 때 카드 안에 보여 주는 안내 조각
+
+    홈의 캘린더 카드, 퀘스트 카드에서 <include> 로 불러 써요. 처음에는 숨겨져(gone) 있고,
+    Java 에서 행정반이 없으면 VISIBLE 로 바꿔요.
+    모양은 홈의 "식단표를 설정해주세요" 안내(layout_meal_empty)와 같게 맞췄어요.
+
+    Java: binding.noUnitCalendar.btnGoUnit.setOnClickListener(...)
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="14dp"
+    android:background="@drawable/bg_soft_box"
+    android:orientation="vertical"
+    android:padding="14dp"
+    android:visibility="gone">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_unit" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="13dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/JjamText.BodyBold"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/no_unit_title" />
+
+            <!-- 카드마다 설명이 달라서 id 를 붙여 Java 에서 글자를 바꿔요 -->
+            <TextView
+                android:id="@+id/tv_no_unit_desc"
+                style="@style/JjamText.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@string/no_unit_desc_calendar" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_go_unit"
+        style="@style/JjamButton.Secondary"
+        android:layout_width="match_parent"
+        android:layout_marginTop="12dp"
+        android:text="@string/no_unit_action" />
+</LinearLayout>

@@ -23,7 +23,7 @@
 
     <!-- 가입 시트 -->
     <string name="join_kicker">행정반 가입</string>
-    <string name="join_title">대원 정보를 입력해주세요</string>
+    <string name="join_title">부대 코드를 입력해주세요</string>
     <string name="label_name">이름</string>
     <string name="hint_name">실명을 입력해주세요</string>
     <string name="label_rank">계급</string>
@@ -132,6 +132,7 @@
     <string name="letter_submit_later">%1$s 후 예약 전송</string>
     <string name="unit_name">%1$s 행정반</string>
 
+
     <!-- [추가] 실제 데이터로 채울 때 쓰는 글자 -->
     <string name="room_unread_count_format">%1$d건</string>
     <string name="room_participants_format">%1$d명</string>
@@ -142,4 +143,17 @@
     <string name="room_promotion_sub_officer">부대 진급 기준 보기</string>
     <string name="room_quest_empty">진행 중인 퀘스트가 없어요</string>
 
+
+    <!-- [추가] 부대 코드로 가입하기 -->
+    <string name="join_desc">이름과 계급은 회원가입 때 입력한 정보를 그대로 써요.</string>
+    <string name="label_unit_code">부대 코드</string>
+    <string name="hint_unit_code">관리자에게 받은 6자리 코드</string>
+    <string name="join_error_code">6자리 부대 코드를 입력해주세요</string>
+    <string name="join_error_not_found">그런 부대 코드가 없어요</string>
+    <!-- getString(R.string.join_confirm_message, "백골 행정반") → "백골 행정반에 가입할까요?" -->
+    <string name="join_confirm_message">%1$s에 가입할까요?</string>
+    <string name="join_confirm_ok">가입하기</string>
+    <!-- 행정반 머리의 부대 이름 + 코드: "제3보병사단 · 부대 코드 A7K2QX" -->
+    <string name="room_unit_with_code">%1$s · 부대 코드 %2$s</string>
+    <string name="room_code_copied">부대 코드를 복사했어요. 대원들에게 알려 주세요!</string>
 </resources>

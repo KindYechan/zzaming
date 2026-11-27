@@ -2,14 +2,16 @@
 <!--
     sheet_join.xml — "기존 행정반에 들어가기" 를 누르면 올라오는 가입 시트
 
+    [변경] 예전에는 이름, 계급, 추천인, 부대 호칭을 입력받았어요.
+           이름과 계급은 회원가입 때 이미 알고 있어서 지우고, 부대 코드 하나만 받아요.
+           부대 코드는 행정반을 만든 사람의 행정반 화면 맨 위에 보여요.
+
     바텀시트 = 화면 아래에서 올라오는 창. Java에서 이렇게 띄워요:
       BottomSheetDialog sheet = new BottomSheetDialog(this);
-      sheet.setContentView(R.layout.sheet_join);
+      SheetJoinBinding sheetBinding = SheetJoinBinding.inflate(getLayoutInflater());
+      sheet.setContentView(sheetBinding.getRoot());
       sheet.show();
-    시트 안의 뷰는 sheet.findViewById(R.id.xxx) 로 찾아요. (sheet. 을 꼭 붙이기!)
     닫기: btn_close 를 누르면 sheet.dismiss();
-
-    입력값 읽기: ((EditText) sheet.findViewById(R.id.et_name)).getText().toString()
 -->
 <!-- 시트가 길어져도 키보드에 가려지지 않게 전체를 ScrollView 로 감쌌어요 -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -68,61 +70,30 @@
             app:tint="@color/icon_default" />
     </LinearLayout>
 
-    <!-- 입력 폼: [이름표 + 입력칸] 이 위아래로 반복 -->
-    <LinearLayout
-        android:layout_width="match_parent"
+    <!-- 안내: 이름·계급은 회원가입 정보를 쓴다는 걸 알려 줘요 -->
+    <TextView
+        style="@style/JjamText.Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/join_desc" />
+
+    <!-- 입력 폼: 부대 코드 하나 -->
+    <TextView
+        style="@style/JjamText.FormLabel"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="22dp"
-        android:orientation="vertical">
+        android:text="@string/label_unit_code" />
 
-        <TextView
-            style="@style/JjamText.FormLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:text="@string/label_name" />
-
-        <EditText
-            android:id="@+id/et_name"
-            style="@style/JjamInput"
-            android:autofillHints=""
-            android:hint="@string/hint_name" />
-        <TextView
-            style="@style/JjamText.FormLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="@string/label_rank" />
-
-        <Spinner
-            android:id="@+id/sp_rank"
-            style="@style/JjamSpinner"
-            android:entries="@array/ranks" />
-        <TextView
-            style="@style/JjamText.FormLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="@string/label_referrer" />
-
-        <EditText
-            android:id="@+id/et_referrer"
-            style="@style/JjamInput"
-            android:autofillHints=""
-            android:hint="@string/hint_referrer" />
-        <TextView
-            style="@style/JjamText.FormLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            android:text="@string/label_unit_nickname" />
-
-        <EditText
-            android:id="@+id/et_unit_nickname"
-            style="@style/JjamInput"
-            android:autofillHints=""
-            android:hint="@string/hint_unit_nickname_join" />
-    </LinearLayout>
+    <!-- textCapCharacters: 키보드가 대문자로 나와요 / maxLength: 6글자까지만 -->
+    <EditText
+        android:id="@+id/et_unit_code"
+        style="@style/JjamInput"
+        android:autofillHints=""
+        android:hint="@string/hint_unit_code"
+        android:inputType="textCapCharacters"
+        android:maxLength="6" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_submit"

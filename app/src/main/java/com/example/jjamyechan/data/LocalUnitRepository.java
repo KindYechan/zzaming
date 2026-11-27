@@ -6,10 +6,11 @@ import com.example.jjamyechan.AdminRoon;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.HashMap;
+import java.util.Random;
 
 /**
  * 서버 대신 기기 안에 행정반을 저장하는 구현.
- * 같은 폰에서는 A 계정으로 만든 행정반에 B 계정으로 닉네임을 입력해 가입해 볼 수 있어요.
+ * 같은 폰에서는 A 계정으로 만든 행정반에 B 계정으로 부대 코드를 입력해 가입해 볼 수 있어요.
  */
 public class LocalUnitRepository implements UnitRepository {
     private static final String KEY_UNITS = "units";   // 부대코드 → AdminRoon
@@ -25,25 +26,11 @@ public class LocalUnitRepository implements UnitRepository {
 
     @Override
     public void createUnit(AdminRoon unit, DataCallback<AdminRoon> callback) {
-        if (unit.getNickname() != null && !unit.getNickname().isEmpty() && findLocal(unit.getNickname()) != null) {
-            callback.onFailure(new Exception("이미 있는 행정반 닉네임이에요"));
-            return;
-        }
-        unit.setUnitCode("unit_" + System.currentTimeMillis());   // 서버라면 문서 id 를 쓰면 돼요
+        unit.setUnitCode(makeNewCode());
         unit.setMemberCount(1);
         units.put(unit.getUnitCode(), unit);
         store.put(KEY_UNITS, units);
         callback.onSuccess(unit);
-    }
-
-    @Override
-    public void findByNickname(String nickname, DataCallback<AdminRoon> callback) {
-        AdminRoon unit = findLocal(nickname);
-        if (unit == null) {
-            callback.onFailure(new Exception("그런 행정반이 없어요"));
-        } else {
-            callback.onSuccess(unit);
-        }
     }
 
     @Override
@@ -63,10 +50,19 @@ public class LocalUnitRepository implements UnitRepository {
         if (callback != null) callback.onSuccess(null);
     }
 
-    private AdminRoon findLocal(String nickname) {
-        for (AdminRoon unit : units.values()) {
-            if (nickname.equals(unit.getNickname())) return unit;
-        }
-        return null;
+    // 대원들이 입력하기 쉬운 6자리 부대 코드 만들기. 예) "A7K2QX"
+    // 헷갈리는 글자(0과 O, 1과 I)는 뺐어요. 이미 있는 코드가 나오면 다시 뽑아요.
+    private String makeNewCode() {
+        String letters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        Random random = new Random();
+        String code;
+        do {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 6; i++) {
+                sb.append(letters.charAt(random.nextInt(letters.length())));
+            }
+            code = sb.toString();
+        } while (units.containsKey(code));
+        return code;
     }
 }

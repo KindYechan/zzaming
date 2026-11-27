@@ -1,6 +1,8 @@
 package com.example.jjamyechan;
 
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -198,6 +200,7 @@ public class AdminRoomActivity extends AppCompatActivity {
                     name = unit.getUnitName();
                 }
                 applyUnit(name, unit.getFeatures(), unit.getMemberCount());
+                showUnitCode(unit);
             }
 
             @Override
@@ -230,6 +233,18 @@ public class AdminRoomActivity extends AppCompatActivity {
         binding.cardBroadcast.setVisibility(feature[4] ? View.VISIBLE : View.GONE);
         // 마음의 편지 카드 보이게할지
         binding.cardLetter.setVisibility(feature[5] ? View.VISIBLE : View.GONE);
+    }
+
+    // [추가] 머리의 작은 글자: "제3보병사단 · 부대 코드 A7K2QX"
+    // 누르면 코드가 복사돼서, 대원들에게 메신저로 바로 보낼 수 있어요
+    private void showUnitCode(AdminRoon unit) {
+        binding.tvRoomUnit.setText(getString(R.string.room_unit_with_code, unit.getUnitName(), unit.getUnitCode()));
+        binding.tvRoomUnit.setOnClickListener(view -> {
+            // ClipboardManager = 폰의 "복사하기/붙여넣기" 저장 공간
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+            clipboard.setPrimaryClip(ClipData.newPlainText("unit code", unit.getUnitCode()));
+            Toast.makeText(this, R.string.room_code_copied, Toast.LENGTH_SHORT).show();
+        });
     }
 
     // ───────────── 요약 카드: 오늘 날짜와 시간 ─────────────

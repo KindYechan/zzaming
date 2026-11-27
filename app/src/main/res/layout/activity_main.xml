@@ -535,6 +535,11 @@
                 </LinearLayout>
                 </LinearLayout>
 
+                <!-- [추가] 행정반이 없을 때 안내 (평소에는 숨김). 행정반이 없으면 아래 요일 줄과 오늘 일정을 숨기고 이걸 보여요 -->
+                <include
+                    android:id="@+id/no_unit_calendar"
+                    layout="@layout/layout_no_unit" />
+
                 <!-- 요일 7칸: 칸(36dp) 사이에 weight 가 있는 Space 를 넣어 양끝 정렬(space-between).
                      칸마다 안쪽 id(tv_week_label 등)가 같아요 → Java에서
                      findViewById(R.id.week_wed).findViewById(R.id.tv_week_date) 처럼 칸을 먼저 찾고 그 안에서 찾으면 됩니다.
@@ -944,6 +949,11 @@
                         app:tint="@color/text_hint" />
                 </LinearLayout>
                 </LinearLayout>
+
+                <!-- [추가] 행정반이 없을 때 안내 (평소에는 숨김) -->
+                <include
+                    android:id="@+id/no_unit_quest"
+                    layout="@layout/layout_no_unit" />
 
                 <!-- 다른 파일(layout_xp_preview.xml)을 불러와 끼워넣기 -->
                 <include

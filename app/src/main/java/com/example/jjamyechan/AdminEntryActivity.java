@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -54,46 +55,28 @@ public class AdminEntryActivity extends AppCompatActivity {
             });
 
             // 제출 버튼 누르면
+            // [변경] 이름·계급은 회원가입 정보를 쓰니까 부대 코드만 받아요
             sheetBinding.btnSubmit.setOnClickListener(view2 -> {
-                // edit text 데이터 가져오기
-                String name = sheetBinding.etName.getText().toString().trim();
-                int rankPos = sheetBinding.spRank.getSelectedItemPosition();
-                String rank = sheetBinding.spRank.getSelectedItem().toString();
-                String unitNickname = sheetBinding.etUnitNickname.getText().toString().trim();
+                // 앞뒤 공백 지우고, 소문자로 적어도 되게 대문자로 바꾸기
+                String code = sheetBinding.etUnitCode.getText().toString().trim().toUpperCase();
 
-                // 데이터 입력 안했으면 에러
-                if (name.isEmpty()) {
-                    sheetBinding.etName.setError("이름을 입력해주세요");
-                    return;
-                }
-                if (rankPos == 0) {
-                    Toast.makeText(this, "계급을 설정해주세요", Toast.LENGTH_SHORT).show();
+                // 6자리가 아니면 에러
+                if (code.length() != 6) {
+                    sheetBinding.etUnitCode.setError(getString(R.string.join_error_code));
                     return;
                 }
 
-                // [병합 시 추가] 닉네임으로 행정반을 찾아 가입 (지금은 기기 저장소, 나중에는 서버)
-                DataProvider.units().findByNickname(unitNickname, new DataCallback<AdminRoon>() {
+                // 코드로 행정반 찾기 (지금은 기기 저장소, 나중에는 서버)
+                DataProvider.units().getUnit(code, new DataCallback<AdminRoon>() {
                     @Override
                     public void onSuccess(AdminRoon unit) {
-                        User me = UserManager.getCurrentUser();
-                        me.setUnitCode(unit.getUnitCode());
-                        me.setRole("member");
-                        UserManager.saveCurrentUser();
-                        unit.setMemberCount(unit.getMemberCount() + 1);
-                        DataProvider.units().saveUnit(unit, null);
-
-                        // intent로 데이터 전달
-                        Intent intent = new Intent(AdminEntryActivity.this, AdminRoomActivity.class);
-                        intent.putExtra("unit_nickname", unitNickname);
-                        intent.putExtra("rank", rank);
-                        sheet.dismiss();
-                        startActivity(intent);
-                        finish();
+                        // 찾았으면 "○○ 행정반에 가입할까요?" 한 번 물어보기
+                        confirmJoin(unit, sheet);
                     }
 
                     @Override
                     public void onFailure(Exception e) {
-                        sheetBinding.etUnitNickname.setError(e.getMessage());
+                        sheetBinding.etUnitCode.setError(getString(R.string.join_error_not_found));
                     }
                 });
             });
@@ -163,6 +146,7 @@ public class AdminEntryActivity extends AppCompatActivity {
                     User me = UserManager.getCurrentUser();
                     AdminRoon unit = new AdminRoon(unitName, unitNickname, unitType, unitDesc, editPermission, me.getEmail(),
                             features[0], features[1], features[2], features[3], features[4], features[5]);
+                    unit.setActivityLog(activityLog);   // [추가] 예전에는 저장하지 않던 값
                     DataProvider.units().createUnit(unit, new DataCallback<AdminRoon>() {
                         @Override
                         public void onSuccess(AdminRoon created) {
@@ -170,17 +154,9 @@ public class AdminEntryActivity extends AppCompatActivity {
                             me.setRole("owner");
                             UserManager.saveCurrentUser();
 
-                            // intent로 데이터 전달
-                            Intent intent = new Intent(AdminEntryActivity.this, AdminRoomActivity.class);
-                            intent.putExtra("unit_name", unitName);
-                            intent.putExtra("unit_nickname", unitNickname);
-                            intent.putExtra("unit_type", unitType);
-                            intent.putExtra("unit_desc", unitDesc);
-                            intent.putExtra("feature", features);
-                            intent.putExtra("edit_permission", editPermission);
-                            intent.putExtra("activity_log", activityLog);
+                            // [변경] 행정반 화면은 저장소에서 정보를 읽어서, Intent 로 값을 넘길 필요가 없어요
                             sheet2.dismiss();
-                            startActivity(intent);
+                            startActivity(new Intent(AdminEntryActivity.this, AdminRoomActivity.class));
                             finish();
                         }
 
@@ -205,5 +181,35 @@ public class AdminEntryActivity extends AppCompatActivity {
             }
             return true;
         });
+    }
+
+    // [추가] 부대 코드로 찾은 행정반에 가입할지 한 번 물어보고, "가입하기"를 누르면 가입 처리
+    private void confirmJoin(AdminRoon unit, BottomSheetDialog sheet) {
+        // 닉네임이 있으면 닉네임, 없으면 부대 이름으로 보여 주기
+        String name = unit.getNickname();
+        if (name == null || name.isEmpty()) {
+            name = unit.getUnitName();
+        }
+
+        new AlertDialog.Builder(this)
+                .setMessage(getString(R.string.join_confirm_message, getString(R.string.unit_name, name)))
+                .setNegativeButton(R.string.action_cancel, null)   // null = 그냥 닫기
+                .setPositiveButton(R.string.join_confirm_ok, (dialog, which) -> {
+                    // 1. 내 정보에 부대 코드 저장 (이름·계급은 회원가입 정보 그대로)
+                    User me = UserManager.getCurrentUser();
+                    me.setUnitCode(unit.getUnitCode());
+                    me.setRole("member");
+                    UserManager.saveCurrentUser();
+
+                    // 2. 행정반 인원 수 +1
+                    unit.setMemberCount(unit.getMemberCount() + 1);
+                    DataProvider.units().saveUnit(unit, null);
+
+                    // 3. 행정반 화면으로
+                    sheet.dismiss();
+                    startActivity(new Intent(this, AdminRoomActivity.class));
+                    finish();
+                })
+                .show();
     }
 }

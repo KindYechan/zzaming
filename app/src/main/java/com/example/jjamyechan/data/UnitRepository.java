@@ -5,20 +5,19 @@ import com.example.jjamyechan.AdminRoon;
 /**
  * 행정반(부대) 정보를 주고받는 창구.
  *
+ * 부대 코드(unitCode): 행정반을 만들 때 정해지는 6자리 코드. 대원들은 이 코드를 입력해서 가입해요.
+ *
  * 서버 담당이 만들 것: FirebaseUnitRepository implements UnitRepository
- *   - createUnit → Firestore "units/{unitCode}" 저장
- *   - findByNickname → "units" 에서 nickname 이 같은 문서 찾기 (whereEqualTo)
- *   - getUnit → "units/{unitCode}" 읽기
+ *   - createUnit → 겹치지 않는 6자리 코드를 만들어 Firestore "units/{unitCode}" 에 저장
+ *   - getUnit    → "units/{unitCode}" 읽기 (가입할 때도 이걸로 코드가 맞는지 확인해요)
+ *   - saveUnit   → "units/{unitCode}" 덮어쓰기
  */
 public interface UnitRepository {
 
-    // 새 행정반 만들기. unitCode 를 만들어 채운 뒤 돌려줘요. 같은 닉네임이 있으면 onFailure
+    // 새 행정반 만들기. 부대 코드를 만들어 채운 뒤 돌려줘요
     void createUnit(AdminRoon unit, DataCallback<AdminRoon> callback);
 
-    // 가입할 때: 닉네임으로 행정반 찾기. 없으면 onFailure
-    void findByNickname(String nickname, DataCallback<AdminRoon> callback);
-
-    // 부대 코드로 행정반 정보 읽기. 없으면 onFailure
+    // 부대 코드로 행정반 정보 읽기. 없는 코드면 onFailure
     void getUnit(String unitCode, DataCallback<AdminRoon> callback);
 
     // 행정반 정보 저장 (인원 수, 기능 켜고 끄기 등)

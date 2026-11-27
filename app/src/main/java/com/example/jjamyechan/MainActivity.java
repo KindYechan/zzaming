@@ -119,6 +119,16 @@ public class MainActivity extends AppCompatActivity {
 
     // 요일 칸 7개에 이번 주 날짜를 쓰고, 오늘 칸만 진하게 칠해요
     private void showWeekCalendar() {
+        // [추가] 행정반이 없으면 요일 줄·오늘 일정 대신 안내를 보여 주고 끝
+        boolean hasUnit = FeatureNavigator.hasUnit();
+        binding.noUnitCalendar.getRoot().setVisibility(hasUnit ? View.GONE : View.VISIBLE);
+        binding.weekRow.setVisibility(hasUnit ? View.VISIBLE : View.GONE);
+        binding.itemTodaySchedule.setVisibility(hasUnit ? View.VISIBLE : View.GONE);
+        if (!hasUnit) {
+            binding.noUnitCalendar.tvNoUnitDesc.setText(R.string.no_unit_desc_calendar);
+            binding.noUnitCalendar.btnGoUnit.setOnClickListener(view -> FeatureNavigator.openUnitEntry(this));
+            return;   // 아래 코드는 실행하지 않아요
+        }
 
         // 칸 7개를 배열로 묶어 두면 반복문 하나로 처리할 수 있어요 (월 ~ 일 순서)
         LinearLayout[] cells = {binding.weekMon, binding.weekTue, binding.weekWed, binding.weekThu,
@@ -223,6 +233,16 @@ public class MainActivity extends AppCompatActivity {
 
     // 경험치 줄 + 아직 안 한 퀘스트 2개 보여 주기
     private void showQuestCard() {
+        // [추가] 행정반이 없으면 경험치 줄·퀘스트 목록 대신 안내를 보여 주고 끝
+        boolean hasUnit = FeatureNavigator.hasUnit();
+        binding.noUnitQuest.getRoot().setVisibility(hasUnit ? View.GONE : View.VISIBLE);
+        binding.xpPerview.getRoot().setVisibility(hasUnit ? View.VISIBLE : View.GONE);
+        binding.listQuest.setVisibility(hasUnit ? View.VISIBLE : View.GONE);
+        if (!hasUnit) {
+            binding.noUnitQuest.tvNoUnitDesc.setText(R.string.no_unit_desc_quest);
+            binding.noUnitQuest.btnGoUnit.setOnClickListener(view -> FeatureNavigator.openUnitEntry(this));
+            return;
+        }
 
         // 퀘스트 화면이 쓰는 QuestViewModel 을 그대로 써요.
         // 만들 때 저장소에서 읽어 오고, 처음이면 예시 퀘스트를 채워 줘요.
