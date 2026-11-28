@@ -16,16 +16,21 @@ import com.example.jjamyechan.databinding.ActivityPromotionBinding;
 
 import java.time.LocalDate;
 
+// 내 정보 수정할 때 나올 액티비티
+// 대부분이 회원가입과 비슷하다.
+
 public class EditProfileActivity extends AppCompatActivity {
     private ActivityEditProfileBinding binding;
     private User user;
     private LocalDate enlistDate, dischargeDate;
-    private static final String[] RANK_CODES = {"private", "private-first-class", "corporal", "sergeant"};
+    private static final String[] RANK_CODES = {"private", "pfc", "corporal", "sergeant"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        // 유저 정보를 보여줘야하지
         User user = UserManager.getCurrentUser();
         binding.tvUsername.setText(user.getEmail());
         binding.etName.setText(user.getName());
@@ -57,6 +62,9 @@ public class EditProfileActivity extends AppCompatActivity {
         });
 
         // 3) 저장
+
+        // 정보가 없을 때의 예외처리 구현
+        // 저장하면 UserManager.saveCurrentUser로 서버에 저장
         binding.btnSave.setOnClickListener(view -> {
             String name = binding.etName.getText().toString().trim();
 

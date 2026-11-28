@@ -7,7 +7,8 @@ public class AdminRoon {
     boolean useCalendar, useQuest, usePromotion, useNotice, useBroadcast, useLetter;
     // 소속 부대원
     int memberCount;
-    // [추가] 활동 로그 기록 여부 (생성 2단계의 스위치)
+    // 활동 로그 기록 여부 (생성 2단계의 스위치)
+    // Todo(아마도): 이녀석은 구현 안할 듯 싶긴 하다
     boolean activityLog;
 
     public AdminRoon() {
@@ -63,8 +64,12 @@ public class AdminRoon {
         return memberCount;
     }
 
-    // [병합 시 추가] 기능 사용 여부를 AdminRoomActivity 가 쓰던 순서의 배열로
+    // 기능 사용 여부를 AdminRoomActivity 가 쓰던 순서의 배열로
+
+    // AdminRoomActivity의 기능들 배치가 행정반 생성 시트의 배치랑 달라서
+    // 이 순서를 맞춰주기 위한 작업을 굳이굳이 다시 했습니다.
     // (캘린더, 퀘스트, 진급계산, 게시판, 전파사항, 마편)
+
     public boolean[] getFeatures() {
         return new boolean[]{useCalendar, useQuest, usePromotion, useNotice, useBroadcast, useLetter};
     }

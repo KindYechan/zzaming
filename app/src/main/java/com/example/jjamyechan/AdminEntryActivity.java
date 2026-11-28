@@ -20,6 +20,10 @@ import com.example.jjamyechan.databinding.SheetJoinBinding;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+// 행정반 가입 및 생성에 사용되는 Activity
+// 초기 버전은 가입에 이름, 별명 등이 사용되었지만 이를 부대코드로 변경했습니다.
+//
+
 public class AdminEntryActivity extends AppCompatActivity {
     private ActivityAdminEntryBinding binding;
 
@@ -183,7 +187,10 @@ public class AdminEntryActivity extends AppCompatActivity {
         });
     }
 
-    // [추가] 부대 코드로 찾은 행정반에 가입할지 한 번 물어보고, "가입하기"를 누르면 가입 처리
+    // 부대 코드로 찾은 행정반에 가입할지 한 번 물어보고, "가입하기"를 누르면 가입 처리
+
+    // 이미 존재하는 부대에 가입할 때 사용하는 메소드
+    // dialog를 통해 가입을 확인받습니다.
     private void confirmJoin(AdminRoon unit, BottomSheetDialog sheet) {
         // 닉네임이 있으면 닉네임, 없으면 부대 이름으로 보여 주기
         String name = unit.getNickname();

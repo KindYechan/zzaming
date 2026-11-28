@@ -12,6 +12,11 @@ import com.example.jjamyechan.User;
  *   - saveUser → Firestore "users/{email}" 덮어쓰기
  * 그다음 DataProvider 에서 new LocalUserRepository(...) 한 줄만 바꾸면 돼요.
  */
+
+// 지금 당장은 interface로 만들어서, 구현은 LocalUserRepository에서 이루어지지만
+// 나중에 server가 구현되면 java파일을 대체할 수 있는 것!
+// 건규야 쉽지 않겠지만 부탁해!
+
 public interface UserRepository {
 
     // 회원가입. 같은 아이디가 있으면 onFailure(DuplicateException)

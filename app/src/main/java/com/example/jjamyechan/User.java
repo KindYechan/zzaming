@@ -4,6 +4,15 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
+/*
+유저 정보를 하나의 클래스로 만들어서 관리한다.
+회원 가입시 부대코드 및 역할을 제외한 모든 정보를 받는다.
+부대코드 및 역할은 행정반 생성 및 가입 시에 입력받는다.
+
+진급일은 실제로 값을 저장해두지 않고, 매 순간 조건에 따라서 진급일을 계산 및 출력
+
+주로 MainActivity의 유저 카드 출력, AdminRoomActivity의 유저 정보 및 진급일 계산에 사용되는 class
+ */
 public class User {
 
     // (왼쪽부터) 이메일, 이름, 병or간부, 계급, 입대일, 전역일, 부대코드, 역할(수정권한)
@@ -193,6 +202,10 @@ public class User {
     }
 
     // 그 계급으로 진급하는 날 (진급했으면 실제 날짜, 아니면 정상 예정일)
+
+    // 진급계산기 카드에 사용됩니다.
+    // 또한 진급일 및 진급예정일을 보유하고있는 유저 클래스 데이터 계산에 사용
+
     public LocalDate getPromotionDate(String rank) {
         switch (rank) {
             case "pfc":
@@ -214,6 +227,11 @@ public class User {
 
     // 계급 코드 → 한글. 예) "pfc" → "일병"
     // static 이라서 User 객체 없이 User.rankToKorean("pfc") 처럼 쓸 수 있어요
+
+    // 계급 코드를 영어 데이터로 저장 및 계산하는데
+    // 메인화면, 행정반 화면에서는 이를 한국어로 표시해야 하기 때문에 존재
+    // 홈의 유저 카드, xp 바, 행정반의 ~~까지 몇일 표시할 때 사용
+    // MainActivity 및 AdminRoomActivity 에서 사용합니다.
     public static String rankToKorean(String rank) {
         if (rank == null) return "간부";
         switch (rank) {
@@ -227,6 +245,9 @@ public class User {
     }
 
     // 다음 계급 코드. 병장이거나 간부면 null
+
+    // 진급계산기 카드에서 병장 및 간부 예외처리에 사용되는 함수
+    // AdminRoomActivity 에서 사용합니다.
     public static String nextRank(String rank) {
         if (rank == null) return null;
         switch (rank) {

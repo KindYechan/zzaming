@@ -13,6 +13,11 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.jjamyechan.databinding.ActivitySettingsBinding;
 
+
+// 설정 버튼을 누르면 나오는 화면
+// 유저 정보 수정, 행정반 나가기, 로그아웃, 탈퇴 기능만 구현되어있음
+// Todo: 앞으로 기능 추가할 Notification 기능을 사용할 지 switch로 선택할 수 있도록
+
 public class SettingActivity extends AppCompatActivity {
     private ActivitySettingsBinding binding;
 
@@ -69,6 +74,8 @@ public class SettingActivity extends AppCompatActivity {
         showProfile();
     }
     // 프로필카드, 행정반 묶음
+
+    // 설정에
     private void showProfile() {
         User user = UserManager.getCurrentUser();
         binding.tvProfileName.setText(user.getName());

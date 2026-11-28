@@ -94,6 +94,10 @@ public class SignupActivity extends AppCompatActivity {
             }
 
             User user = new User(username, name, type, rank, enlistDate.toString(), dischargeDate.toString());
+
+            // 여기서도 callBack을 통해서 데이터를 처리
+            // email 중복 여부등 판단 및 계산은
+            // LocalUserRepository에서 구현
             UserManager.signup(user, password, new DataCallback<User>() {
                 @Override
                 public void onSuccess(User result) {

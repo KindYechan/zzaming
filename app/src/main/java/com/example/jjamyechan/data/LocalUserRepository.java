@@ -83,6 +83,9 @@ public class LocalUserRepository implements UserRepository {
         if (callback != null) callback.onSuccess(null);
     }
 
+
+    // 처음 로그인하면 저장된 local데이터에서 email 정보를 가져온다.
+    // 저장된 정보가 없으면 x 있으면 복원
     @Override
     public User getSavedLoginUser() {
         String email = store.getString(KEY_LOGIN);

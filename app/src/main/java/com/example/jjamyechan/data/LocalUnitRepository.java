@@ -12,6 +12,10 @@ import java.util.Random;
  * 서버 대신 기기 안에 행정반을 저장하는 구현.
  * 같은 폰에서는 A 계정으로 만든 행정반에 B 계정으로 부대 코드를 입력해 가입해 볼 수 있어요.
  */
+
+// 지금은 Local로 행정반 정보가 저장되어 있어서
+// 같은 핸드폰 다른계정이 아닌 이상 부대 코드를 통한 가입은 불가능합니다.
+
 public class LocalUnitRepository implements UnitRepository {
     private static final String KEY_UNITS = "units";   // 부대코드 → AdminRoon
 

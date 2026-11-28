@@ -63,7 +63,9 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // [병합 시 추가] 팀원 화면으로 가기
+        // 팀원 화면으로 가기
+        // FeatureNavigator.java을 통해서 각자가 구현한 화면으로 이동한다
+
         binding.btnCalendarAll.setOnClickListener(view -> FeatureNavigator.openCalendar(this));
         binding.btnQuestAll.setOnClickListener(view -> FeatureNavigator.openQuest(this));
 
@@ -89,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
     }
     // 화면이 보일 때마다 (처음 열 때 + 다른 화면에서 돌아올 때) 최신 값으로 다시 그려요.
     // 캘린더에서 일정을 추가하거나 퀘스트를 완료하고 돌아오면 바로 반영돼요.
+
+    // 앱이 resume상태가 되면 다시 카드를 수정해야 됨
+    // 예를 들어 user정보가 바뀌었다거나
+    // 퀘스트 혹은 캘린더에 수정이 일어났으면 이를 바로 업데이트 하기 위함
     @Override
     protected void onResume() {
         super.onResume();
@@ -118,8 +124,11 @@ public class MainActivity extends AppCompatActivity {
     // ───────────── ④ 이번 주 캘린더 카드 ─────────────
 
     // 요일 칸 7개에 이번 주 날짜를 쓰고, 오늘 칸만 진하게 칠해요
+
+    // 행정반에 들어갔을 경우, 들어가지 않았을 경우를 나눠서 구현
+    //
     private void showWeekCalendar() {
-        // [추가] 행정반이 없으면 요일 줄·오늘 일정 대신 안내를 보여 주고 끝
+        // 행정반이 없으면 보이는 화면
         boolean hasUnit = FeatureNavigator.hasUnit();
         binding.noUnitCalendar.getRoot().setVisibility(hasUnit ? View.GONE : View.VISIBLE);
         binding.weekRow.setVisibility(hasUnit ? View.VISIBLE : View.GONE);
@@ -127,10 +136,11 @@ public class MainActivity extends AppCompatActivity {
         if (!hasUnit) {
             binding.noUnitCalendar.tvNoUnitDesc.setText(R.string.no_unit_desc_calendar);
             binding.noUnitCalendar.btnGoUnit.setOnClickListener(view -> FeatureNavigator.openUnitEntry(this));
-            return;   // 아래 코드는 실행하지 않아요
+            return;   // 여기서 끝나기 때문에 화면 보여주지 않음
         }
 
         // 칸 7개를 배열로 묶어 두면 반복문 하나로 처리할 수 있어요 (월 ~ 일 순서)
+        // Layout이랑 view들을 배열로 묶어서 관리를 용이하게 한다.
         LinearLayout[] cells = {binding.weekMon, binding.weekTue, binding.weekWed, binding.weekThu,
                 binding.weekFri, binding.weekSat, binding.weekSun};
         TextView[] labels = {binding.tvWeekMonLabel, binding.tvWeekTueLabel, binding.tvWeekWedLabel, binding.tvWeekThuLabel,
@@ -143,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         LocalDate today = LocalDate.now();
         LocalDate monday = getMonday(today);
 
+        // Todo: 각각의 cell들, 즉 요일을 누르면 해당 요일의 일정이 보이는 방식으로 바꿉시다.
         for (int i = 0; i < 7; i++) {
             LocalDate day = monday.plusDays(i);   // 월요일 + i일
             dates[i].setText(String.valueOf(day.getDayOfMonth()));
@@ -233,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
 
     // 경험치 줄 + 아직 안 한 퀘스트 2개 보여 주기
     private void showQuestCard() {
-        // [추가] 행정반이 없으면 경험치 줄·퀘스트 목록 대신 안내를 보여 주고 끝
+        // 퀘스트와 마찬가지로 행정반이 존재할때만
         boolean hasUnit = FeatureNavigator.hasUnit();
         binding.noUnitQuest.getRoot().setVisibility(hasUnit ? View.GONE : View.VISIBLE);
         binding.xpPerview.getRoot().setVisibility(hasUnit ? View.VISIBLE : View.GONE);
@@ -270,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // 3. 줄 두 개에 채우기
+        // 퀘스트 미리보기는 두 개 까지 보여줍니다.
         LinearLayout[] rows = {binding.rowQuest1, binding.rowQuest2};
         View[] checks = {binding.checkQuest1, binding.checkQuest2};
         TextView[] titles = {binding.tvQuest1Title, binding.tvQuest2Title};
@@ -297,6 +309,8 @@ public class MainActivity extends AppCompatActivity {
             xps[i].setText(getString(R.string.quest_xp_reward_format, quest.getRewardXp()));
 
             // 동그라미를 누르면 완료 → 저장 → 카드 다시 그리기
+
+            // Todo: 여기서 그냥 버튼 누르면 완료되는 방식이 너무 심심하니깐, 효과 혹은 dialog를 추가해보자요~
             checks[i].setOnClickListener(view -> {
                 QuestXp.setCompleted(data, quest, true);
                 questModel.save();

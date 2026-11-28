@@ -12,6 +12,10 @@ import com.example.jjamyechan.AdminRoon;
  *   - getUnit    → "units/{unitCode}" 읽기 (가입할 때도 이걸로 코드가 맞는지 확인해요)
  *   - saveUnit   → "units/{unitCode}" 덮어쓰기
  */
+
+// 행정반 생성, 가입, 정보 수정시 저장에 사용되는 인터페이스입니다.
+// 구현은 LocalUnitRepository에서 이뤄졌습니다. 아마 서버 구현되면 사라질듯
+
 public interface UnitRepository {
 
     // 새 행정반 만들기. 부대 코드를 만들어 채운 뒤 돌려줘요

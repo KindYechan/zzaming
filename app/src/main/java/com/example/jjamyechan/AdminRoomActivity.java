@@ -41,6 +41,10 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 
+// 실제 행정반 화면입니다. 각 기능들을 사용할 지 여부에 따라 화면 구성이 달라집니다.
+// Todo: 사용 기능을 키고 끌 수 있는 버튼을 추가합니다
+// Todo: 행정반 전파사항 노티피케이션
+
 public class AdminRoomActivity extends AppCompatActivity {
     private ActivityAdminRoomBinding binding;
 
@@ -148,7 +152,8 @@ public class AdminRoomActivity extends AppCompatActivity {
             });
         });
 
-        // [병합 시 추가] 카드에서 팀원 화면으로 가기
+        // FeatureNavigator.java에서 구현해두었습니다
+        // 카드에서 팀원 화면으로 가기
         binding.btnQuestDetail.setOnClickListener(view -> FeatureNavigator.openQuest(this));
         binding.btnCalendarDetail.setOnClickListener(view -> FeatureNavigator.openCalendar(this));
         binding.cardBoard.setOnClickListener(view -> FeatureNavigator.openBoard(this));
@@ -235,7 +240,7 @@ public class AdminRoomActivity extends AppCompatActivity {
         binding.cardLetter.setVisibility(feature[5] ? View.VISIBLE : View.GONE);
     }
 
-    // [추가] 머리의 작은 글자: "제3보병사단 · 부대 코드 A7K2QX"
+    // 머리의 작은 글자: "제3보병사단 · 부대 코드 A7K2QX"
     // 누르면 코드가 복사돼서, 대원들에게 메신저로 바로 보낼 수 있어요
     private void showUnitCode(AdminRoon unit) {
         binding.tvRoomUnit.setText(getString(R.string.room_unit_with_code, unit.getUnitName(), unit.getUnitCode()));

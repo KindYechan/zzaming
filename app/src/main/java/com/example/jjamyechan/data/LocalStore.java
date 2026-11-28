@@ -11,6 +11,9 @@ import java.lang.reflect.Type;
  * 기기 안에 객체를 JSON 글자로 저장하는 작은 도우미 (SharedPreferences + Gson).
  * Local...Repository 들이 같이 써요. 서버를 붙이면 이 클래스는 필요 없어져요.
  */
+
+// local로 데이터를 저장하기 위해 사용
+
 public class LocalStore {
     private final SharedPreferences prefs;
     private final Gson gson = new Gson();

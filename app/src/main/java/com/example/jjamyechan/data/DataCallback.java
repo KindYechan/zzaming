@@ -8,6 +8,11 @@ package com.example.jjamyechan.data;
  * 지금 쓰는 로컬 저장소는 바로 결과를 주지만, 모양을 미리 서버와 똑같이 맞춰 둔 거예요.
  * 그래서 나중에 서버를 붙여도 화면(Activity) 코드는 바꿀 필요가 없어요.
  */
+
+// DataCallback = 결과가 준비되면 불러 달라고 넘기는 객체 (진동벨)
+// 지금은 바로 불리지만, 서버를 붙이면 응답이 온 뒤에 불린다
+// 그래서 화면 그리는 코드는 반드시 onSuccess 안에 써야 한다
+
 public interface DataCallback<T> {
     void onSuccess(T result);
 
